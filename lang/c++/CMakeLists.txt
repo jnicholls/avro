@@ -51,7 +51,6 @@ if (CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "-Wall")
 endif ()
 
-
 find_package (Boost 1.38 REQUIRED
     COMPONENTS filesystem system program_options iostreams)
 
@@ -81,91 +80,91 @@ add_library (avrocpp SHARED ${AVRO_SOURCE_FILES})
 set_property (TARGET avrocpp
     APPEND PROPERTY COMPILE_DEFINITIONS AVRO_DYN_LINK)
 
-add_library (avrocpp_s STATIC ${AVRO_SOURCE_FILES})
+# add_library (avrocpp_s STATIC ${AVRO_SOURCE_FILES})
 
-set_property (TARGET avrocpp avrocpp_s
+set_property (TARGET avrocpp #avrocpp_s
     APPEND PROPERTY COMPILE_DEFINITIONS AVRO_SOURCE)
 
 set_target_properties (avrocpp PROPERTIES
     VERSION ${AVRO_VERSION_MAJOR}.${AVRO_VERSION_MINOR})
 
-set_target_properties (avrocpp_s PROPERTIES
-    VERSION ${AVRO_VERSION_MAJOR}.${AVRO_VERSION_MINOR})
+# set_target_properties (avrocpp_s PROPERTIES
+#     VERSION ${AVRO_VERSION_MAJOR}.${AVRO_VERSION_MINOR})
 
 target_link_libraries (avrocpp ${Boost_LIBRARIES})
 
-add_executable (precompile test/precompile.cc)
-
-target_link_libraries (precompile avrocpp_s ${Boost_LIBRARIES})
-
-macro (gen file ns)
-    add_custom_command (OUTPUT ${file}.hh
-        COMMAND avrogencpp
-            -p -
-            -i ${CMAKE_CURRENT_SOURCE_DIR}/jsonschemas/${file}
-            -o ${file}.hh -n ${ns} -U
-        DEPENDS avrogencpp ${CMAKE_CURRENT_SOURCE_DIR}/jsonschemas/${file})
-    add_custom_target (${file}_hh DEPENDS ${file}.hh)
-endmacro (gen)
-
-gen (empty_record empty)
-gen (bigrecord testgen)
-gen (bigrecord_r testgen_r)
-gen (bigrecord2 testgen2)
-gen (tweet testgen3)
-gen (union_array_union uau)
-gen (union_map_union umu)
-gen (union_conflict uc)
-gen (recursive rec)
-gen (reuse ru)
-gen (circulardep cd)
-
-add_executable (avrogencpp impl/avrogencpp.cc)
-target_link_libraries (avrogencpp avrocpp_s ${Boost_LIBRARIES})
-
-enable_testing()
-
-macro (unittest name)
-    add_executable (${name} test/${name}.cc)
-    target_link_libraries (${name} avrocpp ${Boost_LIBRARIES})
-    add_test (NAME ${name} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${name})
-endmacro (unittest)
-
-unittest (buffertest)
-unittest (unittest)
-unittest (SchemaTests)
-unittest (LargeSchemaTests)
-unittest (CodecTests)
-unittest (StreamTests)
-unittest (SpecificTests)
-unittest (DataFileTests)
-unittest (JsonTests)
-unittest (AvrogencppTests)
-
-add_dependencies (AvrogencppTests bigrecord_hh bigrecord_r_hh bigrecord2_hh
-    tweet_hh
-    union_array_union_hh union_map_union_hh union_conflict_hh
-    recursive_hh reuse_hh circulardep_hh empty_record_hh)
-
-include (InstallRequiredSystemLibraries)
-
-set (CPACK_PACKAGE_FILE_NAME "avrocpp-${AVRO_VERSION_MAJOR}")
-
-include (CPack)
-
-install (TARGETS avrocpp avrocpp_s
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-    RUNTIME DESTINATION lib)
-
-install (TARGETS avrogencpp RUNTIME DESTINATION bin)
-
-install (DIRECTORY api/ DESTINATION include/avro
-    FILES_MATCHING PATTERN *.hh)
-
-if (NOT CMAKE_BUILD_TYPE)
-    set (CMAKE_BUILD_TYPE Release CACHE STRING
-      "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
-      FORCE)
-endif (NOT CMAKE_BUILD_TYPE)
+# add_executable (precompile test/precompile.cc)
+#
+# target_link_libraries (precompile avrocpp_s ${Boost_LIBRARIES})
+#
+# macro (gen file ns)
+#     add_custom_command (OUTPUT ${file}.hh
+#         COMMAND avrogencpp
+#             -p -
+#             -i ${CMAKE_CURRENT_SOURCE_DIR}/jsonschemas/${file}
+#             -o ${file}.hh -n ${ns} -U
+#         DEPENDS avrogencpp ${CMAKE_CURRENT_SOURCE_DIR}/jsonschemas/${file})
+#     add_custom_target (${file}_hh DEPENDS ${file}.hh)
+# endmacro (gen)
+#
+# gen (empty_record empty)
+# gen (bigrecord testgen)
+# gen (bigrecord_r testgen_r)
+# gen (bigrecord2 testgen2)
+# gen (tweet testgen3)
+# gen (union_array_union uau)
+# gen (union_map_union umu)
+# gen (union_conflict uc)
+# gen (recursive rec)
+# gen (reuse ru)
+# gen (circulardep cd)
+#
+# add_executable (avrogencpp impl/avrogencpp.cc)
+# target_link_libraries (avrogencpp avrocpp_s ${Boost_LIBRARIES})
+#
+# enable_testing()
+#
+# macro (unittest name)
+#     add_executable (${name} test/${name}.cc)
+#     target_link_libraries (${name} avrocpp ${Boost_LIBRARIES})
+#     add_test (NAME ${name} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+#         COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${name})
+# endmacro (unittest)
+#
+# unittest (buffertest)
+# unittest (unittest)
+# unittest (SchemaTests)
+# unittest (LargeSchemaTests)
+# unittest (CodecTests)
+# unittest (StreamTests)
+# unittest (SpecificTests)
+# unittest (DataFileTests)
+# unittest (JsonTests)
+# unittest (AvrogencppTests)
+#
+# add_dependencies (AvrogencppTests bigrecord_hh bigrecord_r_hh bigrecord2_hh
+#     tweet_hh
+#     union_array_union_hh union_map_union_hh union_conflict_hh
+#     recursive_hh reuse_hh circulardep_hh empty_record_hh)
+#
+# include (InstallRequiredSystemLibraries)
+#
+# set (CPACK_PACKAGE_FILE_NAME "avrocpp-${AVRO_VERSION_MAJOR}")
+#
+# include (CPack)
+#
+# install (TARGETS avrocpp avrocpp_s
+#     LIBRARY DESTINATION lib
+#     ARCHIVE DESTINATION lib
+#     RUNTIME DESTINATION lib)
+#
+# install (TARGETS avrogencpp RUNTIME DESTINATION bin)
+#
+# install (DIRECTORY api/ DESTINATION include/avro
+#     FILES_MATCHING PATTERN *.hh)
+#
+# if (NOT CMAKE_BUILD_TYPE)
+#     set (CMAKE_BUILD_TYPE Release CACHE STRING
+#       "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+#       FORCE)
+# endif (NOT CMAKE_BUILD_TYPE)
